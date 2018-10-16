@@ -24,6 +24,8 @@ int main(){
   TMVA::Factory* factory = new TMVA::Factory("TMVAClassification", out, 
     "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification");
 
+  cout<<"Made factory"<<endl; 
+
   //========================================================================
   vector<TString>num; 
   num.emplace_back("50");
@@ -49,9 +51,12 @@ int main(){
     new TMVA::DataLoader("data_pt400p")
   };
   
+  cout<<"Made dataloaders"<<endl; 
+
   for (int i=0; i<9; ++i){
-    TFile* in = new TFile("$TMPDIR/n_18tree/n_18_"+num[i]+".root"); 
-    
+    TFile* in = new TFile("$TMPDIR/n_18vari/n_18_"+num[i]+".root"); 
+    cout<<"read in file "<<in->GetName()<<endl; 
+
     data[i]->AddVariable("s",'F');       
     data[i]->AddVariable("yydr",'F');     
     data[i]->AddVariable("y1dr",'F');      
@@ -59,30 +64,27 @@ int main(){
     data[i]->AddVariable("ptratio",'F');        
     data[i]->AddVariable("y1y",'F');  
     data[i]->AddVariable("y2y",'F');  
+    data[i]->AddVariable("yyy",'F'); 
     data[i]->AddVariable("jety",'F');   
     data[i]->AddVariable("yydy",'F');   
                                      
     data[i]->AddVariable("y1E",'F'); 
-    data[i]->AddVariable("y1pt",'F');
-                                     
     data[i]->AddVariable("y2E",'F'); 
-    data[i]->AddVariable("y2pt",'F');
-
     data[i]->AddVariable("yyE",'F'); 
-    data[i]->AddVariable("yypt",'F');
-                                     
     data[i]->AddVariable("jetE",'F');     
     
-    data[i]->AddVariable("yyy",'F');     
+    data[i]->AddVariable("y1pt",'F');
+    data[i]->AddVariable("y2pt",'F');
+    data[i]->AddVariable("yypt",'F');
+                                     
     data[i]->AddVariable("costhet",'F');     
   
-    data[i]->AddSpectator("weight",'F'); 
+    cout<<"problem not in variables"<<endl; 
 
-
-    TTree* sigTrain = (TTree*)in->Get("sigTrain");                             
-    TTree* bgTrain = (TTree*)in->Get("bgTrain");                               
-    TTree* sigTest = (TTree*)in->Get("sigTest");                               
-    TTree* bgTest = (TTree*)in->Get("bgTest"); 
+    TTree* sigTrain = (TTree*)in->Get("sTrain");                             
+    TTree* bgTrain = (TTree*)in->Get("bTrain");                               
+    TTree* sigTest = (TTree*)in->Get("sTest");                               
+    TTree* bgTest = (TTree*)in->Get("bTest"); 
   
     Float_t sig_w = 1./(sigTrain->GetEntries() + sigTest->GetEntries());  
     Float_t bg_w = 3./(bgTrain->GetEntries() + bgTest->GetEntries());   
@@ -92,19 +94,20 @@ int main(){
     data[i]->AddBackgroundTree(bgTrain, bg_w, "Training"); 
     data[i]->AddBackgroundTree(bgTest, bg_w, "Testing"); 
   
-    factory->SetWeightExpression("weight"); 
 
-  //  //Add weights 
-  //  //Loading in weights 
-  //  TMVA::DataLoader* weight_data = new TMVA::DataLoader("weight_data"); 
-  //  weight_data->AddVariable("weights", 'F'); 
-  //
-  //  weight_data->AddSignalTree(sigTrain, sig_w, "Training"); 
-  //  weight_data->AddSignalTree(sigTest, sig_w, "Testing"); 
-  //  weight_data->AddBackgroundTree(bgTrain, bg_w, "Training"); 
-  //  weight_data->AddBackgroundTree(bgTest, bg_w, "Testing"); 
-  //
-  //  data[i]->SetWeightExpression("weight"); 
+    cout<<"Set data for dataloader"<<num[i]<<endl; 
+
+    //Add weights 
+    //Loading in weights 
+    TMVA::DataLoader* weight_data = new TMVA::DataLoader("weight_data"); 
+    weight_data->AddVariable("weight", 'F'); 
+  
+    weight_data->AddSignalTree(sigTrain, sig_w, "Training"); 
+    weight_data->AddSignalTree(sigTest, sig_w, "Testing"); 
+    weight_data->AddBackgroundTree(bgTrain, bg_w, "Training"); 
+    weight_data->AddBackgroundTree(bgTest, bg_w, "Testing"); 
+  
+    data[i]->SetWeightExpression("weight"); 
   }
   //============================================================================
   //Factories 

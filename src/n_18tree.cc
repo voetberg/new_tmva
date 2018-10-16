@@ -33,6 +33,9 @@ int main(){
   chain_b.Add("$TMPDIR/born1_1.root",0); 
   chain_b.Add("$TMPDIR/born1_2.root",0); 
   chain_b.Add("$TMPDIR/born1.root",0); 
+  chain_b.Add("$TMPDIR/born2_1.root",0); 
+  chain_b.Add("$TMPDIR/born2_2.root",0); 
+  chain_b.Add("$TMPDIR/born2.root",0); 
   //===============================================
   //Variables for trees
   Float_t s, yydr, y1dr, y2dr, ptratio, y1y, y2y, jety; 
@@ -351,8 +354,8 @@ int main(){
         double ran = r->Rndm();
         const bool tts = (ran<.5); 
 
-        if (tts){s_train->Fill();}
-        else{s_test->Fill();} 
+        if (tts){b_train->Fill();}
+        else{b_test->Fill();} 
       }
     }
     out->Write(); 
